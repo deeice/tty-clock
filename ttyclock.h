@@ -1,7 +1,6 @@
 /*
  *      TTY-CLOCK headers file.
- *      Copyright © 2009-2013 tty-clock contributors
- *      Copyright © 2008-2009 Martin Duquesnoy <xorg62@gmail.com>
+ *      Copyright © 2008 Martin Duquesnoy <xorg62@gmail.com>
  *      All rights reserved.
  *
  *      Redistribution and use in source and binary forms, with or without
@@ -34,57 +33,51 @@
 #ifndef TTYCLOCK_H_INCLUDED
 #define TTYCLOCK_H_INCLUDED
 
-#include <assert.h>
-#include <errno.h>
-#include <getopt.h>
-#include <signal.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/select.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <time.h>
+#include <signal.h>
+#if 1
+#include <curses.h>
+#else
+#include <stdio.h>
+#include "mcurses.h"
+#endif
 #include <unistd.h>
-
-#include <ncurses.h>
+#include <getopt.h>
 
 /* Macro */
 #define NORMFRAMEW 35
 #define SECFRAMEW  54
 #define DATEWINH   3
+#if 0
 #define AMSIGN     " [AM]"
 #define PMSIGN     " [PM]"
+#else
+#define AMSIGN     "  AM"
+#define PMSIGN     "  PM"
+#endif
+
+typedef enum { False, True } Bool;
 
 /* Global ttyclock struct */
 typedef struct
 {
      /* while() boolean */
-     bool running;
-
-     /* terminal variables */
-     SCREEN *ttyscr;
-     char *tty;
+     Bool running;
      int bg;
 
      /* Running option */
      struct
      {
-          bool second;
-          bool screensaver;
-          bool twelve;
-          bool center;
-          bool rebound;
-          bool date;
-          bool utc;
-          bool box;
-          bool noquit;
-          char format[100];
+          Bool second;
+          Bool twelve;
+          Bool center;
+          Bool rebound;
+          Bool box;
+          char *format;
           int color;
-          bool bold;
           long delay;
-          bool blink;
-          long nsdelay;
      } option;
 
      /* Clock geometry */
@@ -123,15 +116,15 @@ void draw_number(int n, int x, int y);
 void draw_clock(void);
 void clock_move(int x, int y, int w, int h);
 void set_second(void);
-void set_center(bool b);
-void set_box(bool b);
+void set_center(Bool b);
+void set_box(Bool b);
 void key_event(void);
 
 /* Global variable */
-ttyclock_t ttyclock;
+ttyclock_t *ttyclock;
 
 /* Number matrix */
-const bool number[][15] =
+const Bool number[][15] =
 {
      {1,1,1,1,0,1,1,0,1,1,0,1,1,1,1}, /* 0 */
      {0,0,1,0,0,1,0,0,1,0,0,1,0,0,1}, /* 1 */
@@ -146,5 +139,3 @@ const bool number[][15] =
 };
 
 #endif /* TTYCLOCK_H_INCLUDED */
-
-// vim: expandtab tabstop=5 softtabstop=5 shiftwidth=5
